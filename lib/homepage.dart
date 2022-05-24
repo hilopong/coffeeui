@@ -8,6 +8,7 @@ import 'util/coffee_tile2.dart';
 import 'util/coffee_type.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,12 +18,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List coffeeType = [
-    ['Cappucino', true],
-    ['Latte', false],
-    ['Black', false],
-    ['Tea', false]
-  ];
+  List coffeeType = [];
 
   List mainprdlist = [];
 
@@ -35,10 +31,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future getprdlist() async {
+  Future getprdlist(int catecode) async {
     var result = await http.get(Uri.parse(
-        'https://webapi.superdesk.co.kr/AdminProduct/GetPrdList/?companyidx=36'));
+        'https://webapi.superdesk.co.kr/AdminProduct/GetPrdList/?companyidx=' +
+            catecode.toString()));
     var result2 = jsonDecode(result.body);
+    print(result2);
     setState(() {
       mainprdlist = result2;
     });
@@ -49,11 +47,19 @@ class _HomePageState extends State<HomePage> {
         'https://webapi.superdesk.co.kr/AdminProduct/GetOutChannelCateMap'));
     var result2 = jsonDecode(result.body);
     setState(() {
-      coffeeType=[];
-      for(int i=0;i<result2.length;i++){
-        var tempdata=[result2[i]['OrginName'],false];
-        if(i==0){
-          tempdata=[result2[i]['OrginName'],true];
+      coffeeType = [];
+      for (int i = 0; i < result2.length; i++) {
+        var tempdata = [
+          result2[i]['OrginName'],
+          false,
+          result2[i]['OrginCate']
+        ];
+        if (i == 0) {
+          tempdata = [
+            result2[i]['OrginName'],
+            true,
+            result2[i]['OrginCate'],
+          ];
         }
         coffeeType.add(tempdata);
       }
@@ -65,29 +71,27 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     getcatelist();
-    getprdlist();
+    getprdlist(36);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(
-        elevation: 0,
+      bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.transparent,
-        leading: Icon(Icons.menu),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: Icon(Icons.person),
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
+        color: Colors.orange,
+        animationDuration: Duration(milliseconds: 300),
+        onTap: (index) {
+          print(index);
+        },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
+          Icon(
+            Icons.home,
+            color: Colors.white,
+          ),
+          Icon(Icons.favorite, color: Colors.white),
+          Icon(Icons.settings, color: Colors.white),
         ],
       ),
       body: Column(
@@ -132,17 +136,23 @@ class _HomePageState extends State<HomePage> {
                   })),
           Expanded(
               child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: mainprdlist.length,
-              itemBuilder: (context, index) {
-                print(mainprdlist[index]['NVC_prdName']);
-                return CoffeeTile2(
-                  imgurl: mainprdlist[index]['C_prdNo'],
-                  prdname: mainprdlist[index]['NVC_prdName'],
-                  catename: coffeeType[0][0],
-                  price: mainprdlist[index]['I_discountPrice'],
-                );
-              },
+            scrollDirection: Axis.horizontal,
+            itemCount: mainprdlist.length,
+            itemBuilder: (context, index) {
+              print(mainprdlist[index]['NVC_prdName']);
+              return CoffeeTile2(
+                imgurl: mainprdlist[index]['C_prdNo'],
+                prdname: mainprdlist[index]['NVC_prdName'],
+                catename: coffeeType[0][0],
+                price: mainprdlist[index]['I_discountPrice'],
+                onTap: () {
+                  print('here');
+                  var tempcatecode = mainprdlist[index]['OrginCate'];
+                  print(tempcatecode);
+                  getprdlist(tempcatecode);
+                },
+              );
+            },
           ))
         ],
       ),

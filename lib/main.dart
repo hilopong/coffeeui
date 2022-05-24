@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'hidden_draw_hamber_menu.dart';
 import 'homepage.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: HiddenDrawer(),
       theme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.orange
