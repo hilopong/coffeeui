@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'util/coffee_tile.dart';
+import 'util/coffee_tile2.dart';
 import 'util/coffee_type.dart';
+
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,14 +24,31 @@ class _HomePageState extends State<HomePage> {
     ['Tea', false]
   ];
 
+  List mainprdlist = [];
+
   void coffeeTypeSeleted(int index) {
     setState(() {
-      for(var i =0 ; i<coffeeType.length;i++){
-        coffeeType[i][1]=false;
+      for (var i = 0; i < coffeeType.length; i++) {
+        coffeeType[i][1] = false;
       }
-      coffeeType[index][1]=true;
+      coffeeType[index][1] = true;
     });
+  }
 
+  Future getprdlist() async {
+    var result = await http.get(Uri.parse(
+        'https://webapi.superdesk.co.kr/AdminProduct/GetPrdList/?companyidx=36'));
+    var result2 = jsonDecode(result.body);
+    setState(() {
+      mainprdlist = result2;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getprdlist();
   }
 
   @override
@@ -80,25 +102,30 @@ class _HomePageState extends State<HomePage> {
           Container(
               height: 40,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal,
+                  scrollDirection: Axis.horizontal,
                   itemCount: coffeeType.length,
                   itemBuilder: (context, index) {
                     return CoffeeType(
                       coffeetype: coffeeType[index][0],
                       isSelected: coffeeType[index][1],
-                      onTab:(){
+                      onTab: () {
                         coffeeTypeSeleted(index);
-                        } ,
+                      },
                     );
                   })),
           Expanded(
-              child: ListView(
+              child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            children: [
-              CoffeeTile(),
-              CoffeeTile(),
-              CoffeeTile(),
-            ],
+            itemCount: mainprdlist.length,
+            itemBuilder: (context, index) {
+              print(mainprdlist[index]['NVC_prdName']);
+              return CoffeeTile2(
+                imgurl: mainprdlist[index]['C_prdNo'],
+                prdname: mainprdlist[index]['NVC_prdName'],
+                catename: coffeeType[0][0],
+                price: mainprdlist[index]['I_discountPrice'],
+              );
+            },
           ))
         ],
       ),

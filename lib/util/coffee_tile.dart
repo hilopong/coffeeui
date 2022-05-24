@@ -8,6 +8,7 @@ class CoffeeTile extends StatefulWidget {
 }
 
 class _CoffeeTileState extends State<CoffeeTile> {
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -26,7 +27,7 @@ class _CoffeeTileState extends State<CoffeeTile> {
               ),
               Text('Latte',style: TextStyle(fontSize: 20),),
               SizedBox(height: 4,),
-              Text('width almond'),
+              Text('imageUrl'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
