@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List coffeeType = [
+  List coffeeType = [
     ['Cappucino', true],
     ['Latte', false],
     ['Black', false],
@@ -44,10 +44,27 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future getcatelist() async {
+    var result = await http.get(Uri.parse(
+        'https://webapi.superdesk.co.kr/AdminProduct/GetOutChannelCateMap'));
+    var result2 = jsonDecode(result.body);
+    setState(() {
+      coffeeType=[];
+      for(int i=0;i<result2.length;i++){
+        var tempdata=[result2[i]['OrginName'],false];
+        if(i==0){
+          tempdata=[result2[i]['OrginName'],true];
+        }
+        coffeeType.add(tempdata);
+      }
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getcatelist();
     getprdlist();
   }
 
@@ -115,17 +132,17 @@ class _HomePageState extends State<HomePage> {
                   })),
           Expanded(
               child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: mainprdlist.length,
-            itemBuilder: (context, index) {
-              print(mainprdlist[index]['NVC_prdName']);
-              return CoffeeTile2(
-                imgurl: mainprdlist[index]['C_prdNo'],
-                prdname: mainprdlist[index]['NVC_prdName'],
-                catename: coffeeType[0][0],
-                price: mainprdlist[index]['I_discountPrice'],
-              );
-            },
+              scrollDirection: Axis.horizontal,
+              itemCount: mainprdlist.length,
+              itemBuilder: (context, index) {
+                print(mainprdlist[index]['NVC_prdName']);
+                return CoffeeTile2(
+                  imgurl: mainprdlist[index]['C_prdNo'],
+                  prdname: mainprdlist[index]['NVC_prdName'],
+                  catename: coffeeType[0][0],
+                  price: mainprdlist[index]['I_discountPrice'],
+                );
+              },
           ))
         ],
       ),

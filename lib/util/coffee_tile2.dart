@@ -36,7 +36,7 @@ class CoffeeTile2 extends StatelessWidget {
             ),
             Text(
               catename,
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 18),
             ),
             SizedBox(
               height: 4,
