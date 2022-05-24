@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       bottomNavigationBar: CurvedNavigationBar(
-        height: 50,
+        //height: 50,
         backgroundColor: Colors.transparent,
         color: Colors.orange,
         animationDuration: Duration(milliseconds: 300),
